@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Life</title>
+  <style>
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(271deg, #246655, #ecbf32, #ce3232, #b7b4e1, #e1b4df, #76b5c8, #333738);
+      background-size: 1400% 1400%;
+
+      -webkit-animation: Gradient 59s ease infinite;
+      -moz-animation: Gradient 59s ease infinite;
+      animation: Gradient 59s ease infinite;
+    }
+
+    @-webkit-keyframes Gradient {
+        0%{background-position:0% 22%}
+        50%{background-position:100% 79%}
+        100%{background-position:0% 22%}
+    }
+    @-moz-keyframes Gradient {
+        0%{background-position:0% 22%}
+        50%{background-position:100% 79%}
+        100%{background-position:0% 22%}
+    }
+    @keyframes Gradient {
+        0%{background-position:0% 22%}
+        50%{background-position:100% 79%}
+        100%{background-position:0% 22%}
+    }
+
+    @media (max-width: 1024px) {
+      #content {
+        width: 60%;
+      }
+    }
+
+    @media (min-width: 1025px) {
+      #content {
+        width: 420px;
+      } 
+    }
+
+    #content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin: 0 auto;
+      padding-bottom: 20px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom));
+      padding-top: 20px;
+      padding-top: calc(20px + env(safe-area-inset-top));
+      height: 100%;
+    }
+
+    canvas {
+      width: 100%;
+      box-shadow: 0 0 3px 3px white;
+    }
+
+    #buttons {
+      display: flex;
+      width: 100%;
+      margin: 5% 0;
+      box-shadow: 0 0 3px 3px white;
+    }
+
+    #buttons div {
+      display: flex;
+      width: 100%;
+    }
+
+    button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      outline: none;
+      border: none;
+      color: white;
+      font-size: 5vw;
+    }
+
+    #send {
+      background-color: darkseagreen;
+    }
+
+    #clear {
+      background-color: crimson;
+    }
+
+    #plus {
+      background-color: rgb(172, 218, 172);
+    }
+
+    #minus {
+      background-color: lightcoral;
+    }
+  </style>
+</head>
+<body>
+  <span id="debug" style="color: white"></span>
+  <div id="content">
+    <canvas id="canvas"></canvas>
+    <div id="buttons">
+      <button id="send">▲</button>
+      <div>
+        <button id="plus">+</button>
+        <button id="minus">−</button>
+      </div>
+      <button id="clear">DEL</button>
+    </div>
+    <canvas id="builder"></canvas>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
