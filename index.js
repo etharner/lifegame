@@ -108,7 +108,7 @@ const calcAlive = (alives, i, j) => {
       cj <= ((j + 1) === count.y ? j : j + 1);
       cj++ 
     ) {
-      if (ci !== i && cj !== j && alives[ci][cj]) {
+      if ((ci !== i || cj !== j) && alives[ci][cj]) {
         aliveNeighbours++;
       }
     }
@@ -134,7 +134,7 @@ const runLife = () => {
         alivesCanvas[i][j] = alivesBuffer[i][j];
       }
     }
-  }, 1000)
+  }, 500)
 };
 
 initCanvas(ctx, alivesCanvas);
