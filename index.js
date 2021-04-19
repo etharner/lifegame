@@ -11,6 +11,7 @@ let multiplier = 1.0;
 let basicCellSize = canvas.width / 30;
 let aliveChance = Math.random();
 let moved = false;
+let gameSpeed = 500;
 
 const aliveColor = '#59d070';
 const deadColor = '#e3ebe9';
@@ -134,7 +135,7 @@ const runLife = () => {
         alivesCanvas[i][j] = alivesBuffer[i][j];
       }
     }
-  }, 500)
+  }, gameSpeed)
 };
 
 initCanvas(ctx, alivesCanvas);
@@ -174,6 +175,19 @@ document.getElementById('minus').addEventListener('click', () => {
   multiplier -= 1;
   aliveChance = Math.random();
   initCanvas(ctx, alivesCanvas);
+});
+
+document.getElementById('splus').addEventListener('click', () => {
+  clearInterval(interval);
+  if (gameSpeed === 50) return;
+  gameSpeed -= 50;
+  runLife();
+});
+document.getElementById('sminus').addEventListener('click', () => {
+  clearInterval(interval);
+  if (gameSpeed === 1000) return;
+  gameSpeed += 50;
+  runLife();
 });
 
 canvas.addEventListener('mousedown', () => moved = true);
