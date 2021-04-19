@@ -1,16 +1,11 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 canvas.width = canvas.offsetWidth; 
-canvas.height = canvas.width;
-
-const canvasBuilder = document.getElementById('builder');
-const ctxBuilder = canvasBuilder.getContext('2d');
-canvasBuilder.width = canvas.offsetWidth; 
-canvasBuilder.height = canvasBuilder.width;
+canvas.height = canvas.offsetHeight;
 
 let cellSize, count;
 let alivesCanvas = [];
-let alivesBuilder = [];
+let alivesBuffer = [];
 let interval;
 let multiplier = 1.0;
 let basicCellSize = canvas.width / 30;
@@ -32,8 +27,8 @@ const drawRect = (c, x, y, w, h, fill) => {
 };
 
 const fillCanvas = (c, alives) => {
-  for (let i = 0; i < count; i++) {
-    for (let j = 0; j < count; j++) {
+  for (let i = 0; i < count.x; i++) {
+    for (let j = 0; j < count.y; j++) {
       drawRect(
         c,
         i * cellSize,
@@ -47,10 +42,12 @@ const fillCanvas = (c, alives) => {
 };
 
 const initAlives = (alives, count, initValue) => {
-  alives.length = count;
-  for (let i = 0; i < count; i++) {
-    alives[i] = new Array(count);
-    for (let j = 0; j < count; j++) {
+  alives.length = count.x;
+  alivesBuffer.length = count.x;
+  for (let i = 0; i < count.x; i++) {
+    alives[i] = new Array(count.y);
+    alivesBuffer[i] = new Array(count.y);
+    for (let j = 0; j < count.y; j++) {
       alives[i][j] = initValue();
     }
   }
@@ -72,7 +69,7 @@ const initCanvas = (c, alives) => {
   clearCanvas(c);
 
   cellSize = basicCellSize / (multiplier / 3);
-  count = Math.floor(canvas.width / cellSize);
+  count = { x: Math.floor(canvas.width / cellSize) + 1, y: Math.floor(canvas.height / cellSize) + 1 };
 
   initAlives(alives, count, () => Math.random() < aliveChance);
   fillCanvas(c, alives);
@@ -81,13 +78,13 @@ const initCanvas = (c, alives) => {
 const fillCell = (c, alives, x, y) => {
   let [cx, cy] = [-1, -1];
 
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < count.x; i++) {
     if (x >= i * cellSize && x < (i + 1) * cellSize) {
       cx = i;
     }
   }
 
-  for (let j = 0; j < count; j++) {
+  for (let j = 0; j < count.y; j++) {
     if (y >= j * cellSize && y < (j + 1) * cellSize) {
       cy = j;
     }
@@ -103,12 +100,12 @@ const calcAlive = (alives, i, j) => {
 
   for (
     let ci = (i - 1) < 0 ? i : i - 1;
-    ci <= ((i + 1) === count ? i : i + 1);
+    ci <= ((i + 1) === count.x ? i : i + 1);
     ci++ 
   ) {
     for (
       let cj = (j - 1) < 0 ? j : j - 1;
-      cj <= ((j + 1) === count ? j : j + 1);
+      cj <= ((j + 1) === count.y ? j : j + 1);
       cj++ 
     ) {
       if (ci !== i && cj !== j && alives[ci][cj]) {
@@ -125,32 +122,45 @@ const calcAlive = (alives, i, j) => {
 const runLife = () => {
   interval = setInterval(() => {
     clearCanvas(ctx);
-    for (let i = 0; i < count; i++) {
-      for (let j = 0; j < count; j++) {
+    for (let i = 0; i < count.x; i++) {
+      for (let j = 0; j < count.y; j++) {
         const isAlive = calcAlive(alivesCanvas, i, j);
-        alivesCanvas[i][j] = isAlive;
+        alivesBuffer[i][j] = isAlive;
         drawRect(ctx, cellSize * i, cellSize * j, cellSize, cellSize, isAlive ? aliveColor : deadColor);
+      }
+    }
+    for (let i = 0; i < count.x; i++) {
+      for (let j = 0; j < count.y; j++) {
+        alivesCanvas[i][j] = alivesBuffer[i][j];
       }
     }
   }, 1000)
 };
 
 initCanvas(ctx, alivesCanvas);
-emptyCanvas(ctxBuilder, alivesBuilder);
 runLife();
 
-canvasBuilder.addEventListener('click', (e) => fillCell(ctxBuilder, alivesBuilder, e.offsetX, e.offsetY));
+canvas.addEventListener('click', (e) => fillCell(ctx, alivesCanvas, e.offsetX, e.offsetY));
 
-document.getElementById('send').addEventListener('click', () => {
-  clearInterval(interval);
-  alivesCanvas = JSON.parse(JSON.stringify(alivesBuilder));
-  fillCanvas(ctx, alivesCanvas);
-  runLife();
-});
+const switchRun = (stop = false) => {
+  const e = document.getElementById('run');
+  if (e.classList.contains('stop')) {
+    clearInterval(interval);
+    e.classList.remove('stop');
+    e.innerHTML = 'run';
+  }
+  else if (!stop) {
+    runLife();
+    e.classList.add('stop');
+    e.innerHTML = 'stop';
+  }
+}
+
+document.getElementById('run').addEventListener('click', (e) => switchRun());
 document.getElementById('clear').addEventListener('click', () => {
+  switchRun(true);
   clearInterval(interval);
   emptyCanvas(ctx, alivesCanvas);
-  emptyCanvas(ctxBuilder, alivesBuilder);
 });
 
 document.getElementById('plus').addEventListener('click', () => {
@@ -158,27 +168,25 @@ document.getElementById('plus').addEventListener('click', () => {
   multiplier += 1;
   aliveChance = Math.random();
   initCanvas(ctx, alivesCanvas);
-  emptyCanvas(ctxBuilder, alivesBuilder);
 });
 document.getElementById('minus').addEventListener('click', () => {
   if (multiplier === 1) return;
   multiplier -= 1;
   aliveChance = Math.random();
   initCanvas(ctx, alivesCanvas);
-  emptyCanvas(ctxBuilder, alivesBuilder);
 });
 
-canvasBuilder.addEventListener('mousedown', () => moved = true);
-canvasBuilder.addEventListener('mouseup', () => moved = false);
-canvasBuilder.addEventListener('mousemove', (e) => moved && fillCell(ctxBuilder, alivesBuilder, e.offsetX, e.offsetY));
-canvasBuilder.addEventListener('touchmove', (e) => {
+canvas.addEventListener('mousedown', () => moved = true);
+canvas.addEventListener('mouseup', () => moved = false);
+canvas.addEventListener('mousemove', (e) => moved && fillCell(ctx, alivesCanvas, e.offsetX, e.offsetY));
+canvas.addEventListener('touchmove', (e) => {
   e.preventDefault();
   if (moved) fillCell(
-    ctxBuilder,
-    alivesBuilder,
-    e.touches[0].pageX - canvasBuilder.offsetLeft,
-    e.touches[0].pageY - canvasBuilder.offsetTop
+    ctx,
+    alivesCanvas,
+    e.touches[0].pageX - canvas.offsetLeft,
+    e.touches[0].pageY - canvas.offsetTop
   );
 }, { passive: false });
-canvasBuilder.addEventListener('touchstart', () => moved = true, { passive: true});
-canvasBuilder.addEventListener('touchend', () => moved = false);
+canvas.addEventListener('touchstart', () => moved = true, { passive: true});
+canvas.addEventListener('touchend', () => moved = false);

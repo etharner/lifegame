@@ -40,13 +40,13 @@
 
     @media (max-width: 1024px) {
       #content {
-        width: 60%;
+        width: 90%;
       }
     }
 
     @media (min-width: 1025px) {
       #content {
-        width: 420px;
+        width: 900px;
       } 
     }
 
@@ -64,6 +64,7 @@
 
     canvas {
       width: 100%;
+      height: 80%;
       box-shadow: 0 0 3px 3px white;
     }
 
@@ -93,8 +94,12 @@
       font-size: 5vw;
     }
 
-    #send {
+    #run {
       background-color: darkseagreen;
+    }
+
+    #run.stop {
+      background-color: rgb(143, 56, 56);
     }
 
     #clear {
@@ -115,14 +120,13 @@
   <div id="content">
     <canvas id="canvas"></canvas>
     <div id="buttons">
-      <button id="send">▲</button>
+      <button id="run" class="stop">stop</button>
       <div>
         <button id="plus">+</button>
         <button id="minus">−</button>
       </div>
-      <button id="clear">DEL</button>
+      <button id="clear">clear</button>
     </div>
-    <canvas id="builder"></canvas>
   </div>
 
   <script src="index.js"></script>
